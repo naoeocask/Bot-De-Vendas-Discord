@@ -25,7 +25,7 @@ CONFIG = {
     "cor_embed": 0x00FF00
 }
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "TOKEN DO SEU BOT AQUI")
+DISCORD_TOKEN = "TOKEN DO SEU BOT AQUI"
 
 DATA_DIR = "data"
 PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
@@ -143,7 +143,7 @@ async def enviar_feedback_embed(user: discord.Member, produto: Produto, codigo: 
     canal = user.guild.get_channel(canal_id)
     if not canal:
         return
-    embed = discord.Embed(
+    embed = criar_embed(
         title="🛒 Compra Realizada",
         description=(
     f"**Cliente:** {user.mention}\n"
@@ -156,6 +156,13 @@ async def enviar_feedback_embed(user: discord.Member, produto: Produto, codigo: 
     if banner_url():
         embed.set_thumbnail(url=banner_url())
     await canal.send(embed=embed)
+
+def criar_embed(title: str, description: str, color: int = cor_embed()) -> discord.Embed:
+    embed = discord.Embed(title=title, description=description, color=color)
+    embed.set_footer(text="Desenvolvido por naoeocask | github.com/naoeocask",
+                     icon_url="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
+    return embed
+
 
 
 intents = discord.Intents.default()
@@ -223,7 +230,7 @@ class ComprarView(discord.ui.View):
 
         active_tickets[ticket_channel.id] = {"user_id": interaction.user.id, "sku": produto.sku}
 
-        embed = discord.Embed(
+        embed = criar_embed(
             title=f"🎫 Ticket de Compra — {produto.nome}",
             description=(
                 f"**Preço:** {moeda()} {produto.preco:,.2f}\n"
@@ -269,7 +276,7 @@ async def produtos_cmd(interaction: discord.Interaction):
         p = Produto.from_dict(sku, data)
         desc.append(f"**{p.nome}** — `{sku}`\nPreço: {moeda()} {p.preco:,.2f} | Estoque: **{len(p.stock)}**\n")
 
-    embed = discord.Embed(
+    embed = criar_embed(
         title=f"🛒 Produtos — {loja_nome()}",
         description="\n".join(desc),
         color=cor_embed()
@@ -319,7 +326,7 @@ async def admin_painel(interaction: discord.Interaction, sku: str):
         await interaction.response.send_message("❌ SKU não encontrado.", ephemeral=True)
         return
 
-    embed = discord.Embed(
+    embed = criar_embed(
         title=f"🛍️ {produto.nome}",
         description=(
             f"{produto.descricao}\n\n"
@@ -358,7 +365,7 @@ async def admin_list_produtos(interaction: discord.Interaction):
     for sku, data in products.items():
         p = Produto.from_dict(sku, data)
         desc.append(f"• **{p.nome}** (`{p.sku}`) — {moeda()} {p.preco:,.2f} | Estoque: {len(p.stock)}")
-    embed = discord.Embed(title="📦 Produtos (Admin)", description="\n".join(desc), color=cor_embed())
+    embed = criar_embed(title="📦 Produtos (Admin)", description="\n".join(desc), color=cor_embed())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @tree.command(name="definir_pix", description="Define a chave PIX do painel")
@@ -446,7 +453,7 @@ async def aprovar_cmd(interaction: discord.Interaction):
     codigo_entregue = produto.stock.pop(0)
     set_produto(produto)
 
-    embed_dm = discord.Embed(
+    embed_dm = criar_embed(
         title=f"✅ Sua compra foi aprovada — {produto.nome}",
         description=f"**Produto:** {produto.nome}\n**Preço** {moeda()} {produto.preco:,.2f}",
         color=0x57F287
@@ -509,7 +516,7 @@ async def recusar_cmd(interaction: discord.Interaction, motivo: Optional[str] = 
         texto += f"\n**Motivo:** {motivo}"
 
     if user:
-        embed_dm = discord.Embed(title="❌ Pedido recusado", description=texto, color=0xED4245)
+        embed_dm = criar_embed(title="❌ Pedido recusado", description=texto, color=0xED4245)
         await send_dm_safe(user, embed_dm)
 
     await interaction.response.send_message("✅ Ticket recusado.", ephemeral=True)
@@ -519,4 +526,6 @@ async def recusar_cmd(interaction: discord.Interaction, motivo: Optional[str] = 
     except:
         await ch.send("⚠️ Não consegui apagar o canal (permissões?).")
 
-        bot.run(DISCORD_TOKEN)
+if __name__ == "__main__":
+    bot.run(DISCORD_TOKEN)
+
