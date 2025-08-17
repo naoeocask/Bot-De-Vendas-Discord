@@ -1,6 +1,3 @@
-Perfeito! Aqui está o **README.md completo**, já formatado para GitHub, incluindo tudo que você pediu:
-
-````markdown
 # 🛒 Bot de Vendas Discord — Simples
 
 Desenvolvido por **Naoeocask**  
