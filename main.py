@@ -1,3 +1,9 @@
+"""
+Desenvolvido por Naoeocask
+© 2025 Naoeocask
+
+Você pode usar este código livremente, desde que dê os devidos créditos ao autor.
+"""
 
 import json
 import os
